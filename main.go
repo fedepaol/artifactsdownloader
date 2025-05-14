@@ -180,24 +180,23 @@ func decompressLogsPerJob(zipPath string, filter func(jobName string) bool) erro
 	defer r.Close()
 
 	for _, f := range r.File {
+		fmt.Printf("Processing file0: %s\n", f.Name)
 		parts := strings.SplitN(f.Name, "/", 2)
-		if len(parts) < 2 {
+		if len(parts) >= 2 {
 			continue
 		}
-		jobName := parts[0]
-		fileName := parts[1]
-		if fileName == "" || strings.HasSuffix(fileName, "/") {
+		if f.Name == "" || strings.HasSuffix(f.Name, "/") {
 			continue
 		}
-		if filter(jobName) {
+		if filter(f.Name) {
 			continue
 		}
-		jobDir := filepath.Join("logs", jobName)
+		jobDir := filepath.Join("logs")
 		if err := os.MkdirAll(jobDir, 0755); err != nil {
 			fmt.Printf("Error creating job dir: %v\n", err)
 			continue
 		}
-		destPath := filepath.Join(jobDir, fileName)
+		destPath := filepath.Join(jobDir, f.Name)
 		outFile, err := os.OpenFile(destPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
 			fmt.Printf("Error creating log file: %v\n", err)
