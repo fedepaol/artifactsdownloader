@@ -36,8 +36,6 @@ func main() {
 			fmt.Printf("Invalid regex: %v\n", err)
 			os.Exit(1)
 		}
-	} else {
-		artifactRegex = regexp.MustCompile(".*") // match all by default
 	}
 
 	repoOwner := os.Args[1]
@@ -115,7 +113,7 @@ func main() {
 		return
 	}
 	for _, artifact := range artifacts.Artifacts {
-		if artifactRegex.MatchString(artifact.GetName()) {
+		if artifactRegex != nil && artifactRegex.MatchString(artifact.GetName()) {
 			fmt.Printf("Skipping artifact: %s\n", artifact.GetName())
 			continue
 		}
